@@ -1,0 +1,45 @@
+// Pinos de conexão
+const int sensorTempPin = A0;  // Pino analógico para o sensor de temperatura
+const int motorPin = 9;        // Pino digital para o motor (ventilador)
+const int ledPin = 10;         // Pino digital para o LED vermelho
+const int buzzerPin = 11;      // Pino digital para a buzina
+
+void setup() {
+  // Inicialização dos pinos
+  pinMode(motorPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+
+  // Inicializa a comunicação serial (para depuração)
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Leitura do sensor de temperatura
+  int leituraAnalogica = analogRead(sensorTempPin);
+  float temperatura = (leituraAnalogica * 5.0 / 1023.0) * 100.0; // Conversão para °C
+
+  // Exibe a temperatura no monitor serial
+  Serial.print("Temperatura: ");
+  Serial.print(temperatura);
+  Serial.println(" °C");
+
+  // Controle do ventilador
+  if (temperatura >= 30) {
+    digitalWrite(motorPin, HIGH); // Liga o motor
+  } else {
+    digitalWrite(motorPin, LOW); // Desliga o motor
+  }
+
+  // Controle do LED e buzina para emergência
+  if (temperatura > 50) {
+    digitalWrite(ledPin, HIGH);    // Liga o LED vermelho
+    digitalWrite(buzzerPin, HIGH); // Liga a buzina
+  } else {
+    digitalWrite(ledPin, LOW);    // Desliga o LED vermelho
+    digitalWrite(buzzerPin, LOW); // Desliga a buzina
+  }
+
+  // Pequeno atraso para estabilizar a leitura
+  delay(500);
+}
