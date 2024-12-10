@@ -1,0 +1,40 @@
+import speech_recognition as sr
+import os
+import serial
+
+# Configurar a porta serial para comunicação com o Arduino
+arduino = serial.Serial('COM3', 9600)  # Ajuste 'COM3' para a porta correta do Arduino
+
+# Função para ouvir e reconhecer a fala
+def ouvir_microfone():
+    microfone = sr.Recognizer()
+    
+    with sr.Microphone() as source:
+        microfone.adjust_for_ambient_noise(source)
+        print("Diga um comando: ")
+        audio = microfone.listen(source)
+        
+    try:
+        frase = microfone.recognize_google(audio, language='pt-BR')
+        
+        if "ascender luz" in frase.lower():
+            arduino.write(b'LIGAR_LUZ\n')
+            print("Luz acesa.")
+        elif "apagar luz" in frase.lower():
+            arduino.write(b'DESLIGAR_LUZ\n')
+            print("Luz apagada.")
+        elif "ligar ventilador" in frase.lower():
+            arduino.write(b'LIGAR_VENTILADOR\n')
+            print("Ventilador ligado.")
+        elif "desligar ventilador" in frase.lower():
+            arduino.write(b'DESLIGAR_VENTILADOR\n')
+            print("Ventilador desligado.")
+        else:
+            print("Comando não reconhecido.")
+
+    except sr.UnknownValueError:
+        print("Não entendi o comando.")
+
+# Loop principal
+while True:
+    ouvir_microfone()
